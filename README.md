@@ -72,22 +72,26 @@ the Gemini API, see the commented block at the bottom of
 `server/.env.example`.
 
 ```bash
-# 1. Server
+# 1. Server (uses uv — install from https://docs.astral.sh/uv/)
 cd server
 cp .env.example .env
-$EDITOR .env             # fill in LiveKit / Deepgram / OpenAI / GCP keys
-pip install -e .
-python worker.py download-files   # pulls Silero VAD + turn detector
+$EDITOR .env                       # fill in the keys
+uv sync                            # creates .venv and installs deps
+uv run python worker.py download-files   # pulls Silero VAD + turn detector
 # Terminal A:
-python worker.py dev
+uv run python worker.py dev
 # Terminal B:
-uvicorn token_api:app --host 0.0.0.0 --port 8000 --reload
+uv run uvicorn token_api:app --host 0.0.0.0 --port 8000 --reload
 
 # 2. Web (separate terminal)
 cd ../web
 pnpm install
 pnpm dev    # http://localhost:5173
 ```
+
+Prefer pip? `pip install -e .` from `server/` works too — the
+pyproject.toml is standards-compliant. Only the lockfile (`uv.lock`)
+is uv-specific.
 
 Or with Docker:
 
