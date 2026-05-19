@@ -18,6 +18,14 @@ RUN uv sync --frozen --no-install-project
 COPY *.py ./
 RUN uv sync --frozen
 
+# Bake Silero VAD + multilingual turn detector model weights into the
+# image. Without this, the first job crashes because MultilingualModel
+# tries to load files from a local HF cache that doesn't exist yet, and
+# the livekit-agents inference subprocess won't auto-download. Doing
+# it at build time costs ~30 MB and removes the one-time
+# `download-files` step from the docker quick-start.
+RUN uv run python worker.py download-files
+
 # docker-compose overrides this with the right command per service
 # (`python worker.py dev` or `uvicorn token_api:app …`).
 CMD ["python", "worker.py", "dev"]

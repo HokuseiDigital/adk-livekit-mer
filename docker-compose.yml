@@ -14,8 +14,8 @@ services:
   worker:
     build: ./server
     env_file: ./server/.env
-    volumes:
-      - voice-models:/root/.cache
+    # Silero VAD + multilingual turn-detector weights are baked into
+    # the image at build time, so no /root/.cache volume is needed.
     command: python worker.py dev
 
   token-api:
@@ -24,6 +24,3 @@ services:
     ports:
       - "8000:8000"
     command: uvicorn token_api:app --host 0.0.0.0 --port 8000 --reload
-
-volumes:
-  voice-models:
