@@ -70,11 +70,21 @@ _TODOS_STATE_KEY = "todos"
 
 
 def add_todo(item: str, tool_context: ToolContext) -> dict:
-    """Add an item to the user's TODO list for this call."""
+    """Add an item to the user's TODO list for this call.
+
+    Gemini Flash occasionally emits two identical ``function_call`` parts
+    for a single user request; we dedupe consecutive open duplicates so
+    one spoken "add buy milk" reliably produces one row, while still
+    letting the user explicitly add the same text twice across
+    different turns.
+    """
+    text = item.strip()
     todos = list(tool_context.state.get(_TODOS_STATE_KEY, []))
-    todos.append({"text": item.strip(), "done": False})
+    if todos and not todos[-1]["done"] and todos[-1]["text"] == text:
+        return {"already_present": text, "total": len(todos)}
+    todos.append({"text": text, "done": False})
     tool_context.state[_TODOS_STATE_KEY] = todos
-    return {"added": item.strip(), "total": len(todos)}
+    return {"added": text, "total": len(todos)}
 
 
 def list_todos(tool_context: ToolContext) -> dict:
@@ -159,13 +169,21 @@ def create_demo_agent(model: str) -> LlmAgent:
         instruction=(
             "You are a friendly voice assistant. The current user is "
             "{user_name}. Speak naturally and concisely — one or two short "
-            "sentences, no markdown, no asterisks, spell numbers. "
-            "Delegate to SearchAgent for factual questions about LiveKit, "
-            "ADK, Gemini, or this demo. Use get_current_time for time "
-            "questions, lookup_user to find someone's email, "
-            "get_fortune_cookie for a random fortune, add_todo / "
-            "list_todos / complete_todo to manage a per-call TODO list, "
-            "and set_status_message when the user asks you to display "
+            "sentences, no markdown, no asterisks, spell numbers.\n\n"
+            "Tool use rules:\n"
+            "- Call each tool EXACTLY ONCE per user request. Never call "
+            "the same tool with the same arguments twice in a row.\n"
+            "- Wait for the tool result before deciding whether you need "
+            "another tool — never speculate by re-calling.\n\n"
+            "Available tools:\n"
+            "- Delegate to SearchAgent for factual questions about "
+            "LiveKit, ADK, Gemini, or this demo.\n"
+            "- get_current_time for time questions.\n"
+            "- lookup_user to find someone's email.\n"
+            "- get_fortune_cookie for a random fortune.\n"
+            "- add_todo / list_todos / complete_todo for the per-call "
+            "TODO list. Adding one item is exactly one add_todo call.\n"
+            "- set_status_message when the user asks you to display "
             "something on their screen."
         ),
         tools=[
