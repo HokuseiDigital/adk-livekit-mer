@@ -1,0 +1,29 @@
+# LiveKit + ADK MRE — two-service stack.
+#
+# `worker` is the LiveKit Agents worker (registers outbound with LiveKit
+# Cloud, no inbound port). `token-api` is a small FastAPI server that
+# the React frontend hits to mint access tokens. They share the same
+# Docker image (server/) and the same .env file.
+#
+# Run:
+#   cp server/.env.example server/.env
+#   $EDITOR server/.env
+#   docker compose up --build
+
+services:
+  worker:
+    build: ./server
+    env_file: ./server/.env
+    volumes:
+      - voice-models:/root/.cache
+    command: python worker.py dev
+
+  token-api:
+    build: ./server
+    env_file: ./server/.env
+    ports:
+      - "8000:8000"
+    command: uvicorn token_api:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  voice-models:

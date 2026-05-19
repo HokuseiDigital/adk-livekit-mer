@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "livekit-adk-mre-server"
+version = "0.1.0"
+description = "Minimum reproducible example of a LiveKit Agents worker driven by Google ADK"
+requires-python = ">=3.12"
+dependencies = [
+    "livekit-agents>=1.0",
+    "livekit-api>=0.8.0",
+    "livekit-plugins-deepgram",
+    "livekit-plugins-openai",
+    "livekit-plugins-silero",
+    "livekit-plugins-turn-detector",
+    "google-adk>=1.32",
+    "fastapi>=0.117",
+    "uvicorn>=0.37",
+    "python-dotenv>=1.0",
+    "pydantic>=2.0",
+]
+
+[tool.setuptools]
+py-modules = ["adk_bridge", "demo_agent", "worker", "token_api"]

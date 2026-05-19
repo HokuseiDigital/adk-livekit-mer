@@ -1,0 +1,255 @@
+:root {
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --border: #334155;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --accent: #1e3a8a;
+  --danger: #ef4444;
+  --tool: #14b8a6;
+  --tool-result: #8b5cf6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.app__header {
+  margin-bottom: 1.5rem;
+}
+
+.app__header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+.app__header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.app__banner {
+  background: var(--accent);
+  color: var(--text);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.app__main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .app__main {
+    grid-template-columns: 1fr;
+  }
+}
+
+.app__footer {
+  margin-top: 2rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.app__footer code {
+  background: var(--panel);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  min-height: 480px;
+}
+
+.panel h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.panel__hint {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin: 0 0 1rem;
+}
+
+.panel__hint code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.05rem 0.3rem;
+  border-radius: 0.25rem;
+}
+
+.panel__label {
+  display: block;
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.panel__label input {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+.panel__primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: filter 120ms ease-out;
+}
+
+.panel__primary:hover {
+  filter: brightness(1.1);
+}
+
+.panel__primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.panel__error {
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin: 0.75rem 0 0;
+}
+
+.panel__controls {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0;
+}
+
+.stage__visualizer {
+  width: 100%;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage__state {
+  color: var(--muted);
+  text-transform: capitalize;
+  margin: 0;
+}
+
+.event-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 480px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.event-list__empty {
+  color: var(--muted);
+  font-style: italic;
+  padding: 1rem 0;
+}
+
+.event {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border-left: 2px solid var(--border);
+}
+
+.event--status {
+  border-left-color: var(--primary);
+}
+
+.event__header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.event__time {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.event__tag {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.25rem;
+  text-transform: lowercase;
+}
+
+.event__tag--final {
+  background: var(--accent);
+  color: var(--text);
+}
+
+.event__tag--status {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.event__body {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.event__body--tool {
+  color: var(--tool);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8rem;
+}
+
+.event__body--tool-result {
+  color: var(--tool-result);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8rem;
+}
