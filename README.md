@@ -63,9 +63,13 @@ fallback. With `llm_node` overridden, it is never called.
 
 ## Quick start
 
-You'll need accounts for: [LiveKit Cloud](https://cloud.livekit.io),
-[Deepgram](https://console.deepgram.com), [OpenAI](https://platform.openai.com),
-and a Google Cloud project with Vertex AI enabled.
+You'll need API keys for: [LiveKit Cloud](https://cloud.livekit.io),
+[Deepgram](https://console.deepgram.com),
+[OpenAI](https://platform.openai.com), and
+[Google AI Studio](https://aistudio.google.com/app/apikey) (free Gemini
+key, no GCP project needed). If you'd rather use Vertex AI instead of
+the Gemini API, see the commented block at the bottom of
+`server/.env.example`.
 
 ```bash
 # 1. Server
