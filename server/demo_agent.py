@@ -10,9 +10,11 @@ import asyncio
 import contextvars
 import json
 import logging
+import random
 from datetime import UTC, datetime
 
 from google.adk.agents import LlmAgent
+from google.adk.tools import ToolContext
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +43,60 @@ def lookup_user(name: str) -> dict:
     Returns ``{"email": null}`` when the name is not in the demo directory.
     """
     return {"email": _USER_DIRECTORY.get(name.strip().lower())}
+
+
+_FORTUNES = [
+    "A new opportunity will appear when you least expect it.",
+    "The journey of a thousand commits begins with a single push.",
+    "Patience and persistence shape data into gold.",
+    "Today, the bug you fix may save a thousand future engineers.",
+    "Speak less, deploy more.",
+    "Your code will compile on the first try this week.",
+    "An old tool will solve a new problem.",
+    "Refactoring is just procrastination wearing a suit.",
+]
+
+
+def get_fortune_cookie() -> dict:
+    """Return a random fortune cookie message."""
+    return {"fortune": random.choice(_FORTUNES)}
+
+
+# Tool functions can declare ``tool_context: ToolContext`` and ADK
+# auto-injects the active session's context, exposing ``state`` for
+# read/write. The todo list demo uses this to keep state per voice
+# call without any external storage.
+_TODOS_STATE_KEY = "todos"
+
+
+def add_todo(item: str, tool_context: ToolContext) -> dict:
+    """Add an item to the user's TODO list for this call."""
+    todos = list(tool_context.state.get(_TODOS_STATE_KEY, []))
+    todos.append({"text": item.strip(), "done": False})
+    tool_context.state[_TODOS_STATE_KEY] = todos
+    return {"added": item.strip(), "total": len(todos)}
+
+
+def list_todos(tool_context: ToolContext) -> dict:
+    """Read back the current TODO list."""
+    todos = tool_context.state.get(_TODOS_STATE_KEY, [])
+    return {"todos": list(todos), "total": len(todos)}
+
+
+def complete_todo(index: int, tool_context: ToolContext) -> dict:
+    """Mark a TODO as complete by its 1-based index."""
+    todos = list(tool_context.state.get(_TODOS_STATE_KEY, []))
+    if index < 1 or index > len(todos):
+        return {
+            "error": f"There is no TODO at position {index} — you have {len(todos)} item(s)."
+        }
+    todos[index - 1]["done"] = True
+    tool_context.state[_TODOS_STATE_KEY] = todos
+    open_count = sum(1 for t in todos if not t["done"])
+    return {
+        "completed": todos[index - 1]["text"],
+        "remaining_open": open_count,
+    }
 
 
 def set_status_message(text: str) -> dict:
@@ -105,11 +161,21 @@ def create_demo_agent(model: str) -> LlmAgent:
             "{user_name}. Speak naturally and concisely — one or two short "
             "sentences, no markdown, no asterisks, spell numbers. "
             "Delegate to SearchAgent for factual questions about LiveKit, "
-            "ADK, Gemini, or this demo. Use get_current_time when asked "
-            "about the time, lookup_user when asked to find someone, and "
-            "set_status_message when the user asks you to display something "
-            "on screen."
+            "ADK, Gemini, or this demo. Use get_current_time for time "
+            "questions, lookup_user to find someone's email, "
+            "get_fortune_cookie for a random fortune, add_todo / "
+            "list_todos / complete_todo to manage a per-call TODO list, "
+            "and set_status_message when the user asks you to display "
+            "something on their screen."
         ),
-        tools=[get_current_time, lookup_user, set_status_message],
+        tools=[
+            get_current_time,
+            lookup_user,
+            get_fortune_cookie,
+            add_todo,
+            list_todos,
+            complete_todo,
+            set_status_message,
+        ],
         sub_agents=[search_agent],
     )

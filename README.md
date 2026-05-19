@@ -105,12 +105,16 @@ cd web && pnpm install && pnpm dev
 ## What the demo agent can do
 
 `server/demo_agent.py` defines a small ADK `LlmAgent` (`DemoCoordinator`)
-with one sub-agent (`SearchAgent`) and four function tools:
+with one sub-agent (`SearchAgent`) and seven function tools:
 
 | Tool | What it shows |
 |---|---|
 | `get_current_time()` | Plain function calling, zero args |
-| `lookup_user(name)` | Args + structured return value |
+| `lookup_user(name)` | Args + structured return value (in-memory dict) |
+| `get_fortune_cookie()` | Trivial randomized tool, no state |
+| `add_todo(item)` | Mutating session state via `ToolContext.state` |
+| `list_todos()` | Reading the same per-call state |
+| `complete_todo(index)` | State updates across multiple turns |
 | `set_status_message(text)` | Voice → UI via LiveKit data channel |
 | `search_facts(query)` (on sub-agent) | Delegation between ADK agents |
 
@@ -118,6 +122,8 @@ Try saying:
 
 - "What time is it?"
 - "Look up Bob's email."
+- "Give me a fortune."
+- "Add 'buy milk' to my list, then add 'call mom', then list my todos."
 - "Tell me about LiveKit." (delegates to `SearchAgent`)
 - "Show 'hello from voice' on screen." (publishes to data channel)
 
