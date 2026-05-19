@@ -160,6 +160,14 @@ Try saying:
    ADK's session state. Is there a more LiveKit-native pattern for
    carrying per-call context that we missed?
 
+7. **Duplicate tool-call dedupe.** Gemini Flash sometimes emits two
+   identical `function_call` parts in a single response. We worked
+   around it with idempotency in `add_todo` (see `server/demo_agent.py`)
+   and a stricter prompt, but it would be useful if the bridge layer
+   could swallow consecutive identical calls before they reach the
+   tool. Is there a hook in `llm_node`-style overrides that LiveKit
+   would recommend for this?
+
 ## File map
 
 ```
